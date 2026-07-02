@@ -5,6 +5,7 @@
   "scripts": {
     "dev:mp-weixin": "uni -p mp-weixin",
     "build:mp-weixin": "uni build -p mp-weixin",
+    "start:mp-weixin": "uni build -p mp-weixin && echo 请导入 dist/build/mp-weixin 到微信开发者工具（无 HMR 噪声）",
     "dev:h5": "uni",
     "build:h5": "uni build",
     "type-check": "vue-tsc --noEmit"

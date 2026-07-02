@@ -1,0 +1,20 @@
+# 本地开发配置示例：复制为 application-local.yml 并填入真实密钥
+llm:
+  provider: deepseek
+
+deepseek:
+  base-url: https://api.deepseek.com
+  api-key: sk-your-deepseek-api-key
+  model: deepseek-chat
+
+dify:
+  base-url: http://localhost/v1
+  api-key: app-your-dify-app-api-key
+
+# 语音服务（OpenAI 兼容 Whisper + TTS，与 DeepSeek/Dify 独立）
+speech:
+  base-url: https://api.openai.com/v1
+  api-key: sk-your-openai-or-compatible-key
+  stt-model: whisper-1
+  tts-model: tts-1
+  tts-voice: nova

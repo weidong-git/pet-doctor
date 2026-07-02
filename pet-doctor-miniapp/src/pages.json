@@ -4,7 +4,8 @@
       "path": "pages/index/index",
       "style": {
         "navigationBarTitleText": "AI医生",
-        "navigationStyle": "custom"
+        "navigationBarBackgroundColor": "#fcfbf9",
+        "disableScroll": true
       }
     },
     {

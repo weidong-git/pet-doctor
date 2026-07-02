@@ -1,4 +1,7 @@
 target/
+application-local.yml
+.env
+.env.local
 .idea/
 *.iml
 .classpath

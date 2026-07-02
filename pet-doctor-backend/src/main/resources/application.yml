@@ -4,11 +4,35 @@ server:
 spring:
   application:
     name: pet-doctor-backend
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
 
-# Dify 大模型配置（生产环境请通过环境变量注入密钥）
+# 大模型提供方：deepseek（默认）| dify
+llm:
+  provider: ${LLM_PROVIDER:deepseek}
+
+# DeepSeek 配置（https://platform.deepseek.com）
+deepseek:
+  base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
+  api-key: ${DEEPSEEK_API_KEY:}
+  model: ${DEEPSEEK_MODEL:deepseek-chat}
+  connect-timeout-ms: 10000
+  read-timeout-ms: 120000
+
+# Dify 配置（llm.provider=dify 时使用）
+# 注意：聊天接口必须使用 app- 开头的「应用 API Key」，dataset- 是知识库密钥
 dify:
-  base-url: https://api.dify.ai/v1
-  api-key: ${DIFY_API_KEY:app-your-dify-api-key}
+  base-url: http://localhost/v1
+  api-key: ${DIFY_API_KEY:}
   chat-messages-path: /chat-messages
   connect-timeout-ms: 10000
   read-timeout-ms: 120000
+
+# 语音服务（OpenAI 兼容 Whisper 识别 + TTS 合成，无需微信插件）
+speech:
+  base-url: ${SPEECH_API_BASE_URL:https://api.openai.com/v1}
+  api-key: ${SPEECH_API_KEY:}
+  stt-model: whisper-1
+  tts-model: tts-1
+  tts-voice: nova
+  audio-cache-ttl-seconds: 300

@@ -4,6 +4,7 @@ import uni from '@dcloudio/vite-plugin-uni'
 import tailwindcssPostcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
 import { UnifiedViteWeappTailwindcssPlugin as weappTailwindcss } from 'weapp-tailwindcss/vite'
+import { mpWeixinPrivateConfigPlugin } from './vite-plugin-mp-weixin-private-config'
 
 export default defineConfig({
   resolve: {
@@ -20,9 +21,11 @@ export default defineConfig({
         plugins: [tailwindcssPostcss(), autoprefixer()],
       },
     }),
+    mpWeixinPrivateConfigPlugin(),
   ],
   server: {
     port: 5173,
+    hmr: false,
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
