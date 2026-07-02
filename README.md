@@ -17,8 +17,10 @@ ai-all/
 
 ### 环境要求
 
-- JDK 17+
+- **JDK 17+**（Spring Boot 3 最低要求，不支持 JDK 8）
 - Maven 3.8+
+
+> 若 IDE 报 `TypeTag :: UNKNOWN` 或 `ExceptionInInitializerError`，通常是 Lombok 与 JDK 版本不兼容。项目已锁定 Lombok `1.18.38`，请在 IDE 中将 **Project SDK** 设为 JDK 17 或 21，并开启 **Annotation Processing**（注解处理），然后重新加载 Maven。
 
 ### 配置 Dify
 
