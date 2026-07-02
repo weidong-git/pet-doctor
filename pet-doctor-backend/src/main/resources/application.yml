@@ -1,0 +1,14 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: pet-doctor-backend
+
+# Dify 大模型配置（生产环境请通过环境变量注入密钥）
+dify:
+  base-url: https://api.dify.ai/v1
+  api-key: ${DIFY_API_KEY:app-your-dify-api-key}
+  chat-messages-path: /chat-messages
+  connect-timeout-ms: 10000
+  read-timeout-ms: 120000

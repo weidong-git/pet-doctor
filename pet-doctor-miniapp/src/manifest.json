@@ -1,0 +1,23 @@
+{
+  "name": "AI宠物医生",
+  "appid": "__UNI__PETDOCTOR",
+  "description": "AI 宠物医疗问诊小程序",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "minified": true
+    },
+    "usingComponents": true,
+    "permission": {
+      "scope.userLocation": {
+        "desc": "用于查找附近宠物医院"
+      }
+    }
+  },
+  "vueVersion": "3"
+}

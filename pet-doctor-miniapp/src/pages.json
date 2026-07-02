@@ -1,0 +1,55 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "AI医生",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/recipe/index",
+      "style": {
+        "navigationBarTitleText": "定制食谱"
+      }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": {
+        "navigationBarTitleText": "我的档案"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "AI宠物医生",
+    "navigationBarBackgroundColor": "#fcfbf9",
+    "backgroundColor": "#fcfbf9"
+  },
+  "tabBar": {
+    "color": "#9ca3af",
+    "selectedColor": "#1f2937",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "AI医生",
+        "iconPath": "static/tab/doctor.png",
+        "selectedIconPath": "static/tab/doctor-active.png"
+      },
+      {
+        "pagePath": "pages/recipe/index",
+        "text": "定制食谱",
+        "iconPath": "static/tab/recipe.png",
+        "selectedIconPath": "static/tab/recipe-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的档案",
+        "iconPath": "static/tab/profile.png",
+        "selectedIconPath": "static/tab/profile-active.png"
+      }
+    ]
+  }
+}
