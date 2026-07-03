@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, watch, onMounted, onUnmounted } from 'vue'
 import { sendMessage, cancelActiveChat } from '@/api/chat'
+import { uploadImage } from '@/api/upload'
 import { WechatVoiceService, isVoiceSupported, checkSpeechAvailable, showSpeechConfigHint } from '@/utils/voice'
 import type { Pet, ChatMessage } from '@/types'
 
@@ -20,6 +21,9 @@ const isRecording = ref(false)
 const autoSpeak = ref(false)
 const speechAvailable = ref(false)
 const speakingMessageId = ref<string | null>(null)
+const pendingImagePreview = ref('')
+const pendingImageUrl = ref('')
+const isUploading = ref(false)
 
 const voiceService = new WechatVoiceService()
 const voiceSupported = isVoiceSupported()
@@ -179,17 +183,63 @@ function genId(): string {
   return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
 }
 
+/** 选择并上传患处图片 */
+function handleChooseImage() {
+  if (isLoading.value || isUploading.value || isRecording.value) return
+
+  uni.chooseImage({
+    count: 1,
+    sizeType: ['compressed'],
+    sourceType: ['album', 'camera'],
+    success: (res) => {
+      const tempPath = res.tempFilePaths[0]
+      if (!tempPath) return
+
+      pendingImagePreview.value = tempPath
+      pendingImageUrl.value = ''
+      isUploading.value = true
+      uni.showLoading({ title: '上传中...', mask: true })
+
+      uploadImage(tempPath)
+        .then((result) => {
+          pendingImageUrl.value = result.url
+          uni.showToast({ title: '图片已上传', icon: 'success' })
+        })
+        .catch((err: Error) => {
+          clearPendingImage()
+          uni.showToast({ title: err.message || '上传失败', icon: 'none' })
+        })
+        .finally(() => {
+          isUploading.value = false
+          uni.hideLoading()
+        })
+    },
+  })
+}
+
+/** 清除待发送图片 */
+function clearPendingImage() {
+  pendingImagePreview.value = ''
+  pendingImageUrl.value = ''
+}
+
 /** 发送用户消息并触发 SSE 流式问诊 */
 function handleSend(query?: string) {
   const text = (query ?? inputText.value).trim()
-  if (!text || isLoading.value) return
+  const imageUrl = pendingImageUrl.value
+  const imagePreview = pendingImagePreview.value
 
+  if ((!text && !imageUrl) || isLoading.value || isUploading.value) return
+
+  const finalQuery = text || '请根据这张图片帮我分析一下宠物的情况'
   inputText.value = ''
+  clearPendingImage()
 
   const userMsg: ChatMessage = {
     id: genId(),
     role: 'user',
-    content: text,
+    content: finalQuery,
+    imageUrl: imagePreview || imageUrl,
   }
   messages.value.push(userMsg)
 
@@ -206,7 +256,8 @@ function handleSend(query?: string) {
     {
       userId: userId.value,
       petId: currentPetId.value,
-      query: text,
+      query: finalQuery,
+      imageUrl: imageUrl || undefined,
     },
     {
       onChunk: (chunk) => {
@@ -335,7 +386,7 @@ function parsePlainText(content: string): string {
           <!-- 用户消息：右侧淡黄色气泡 -->
           <view v-if="msg.role === 'user'" class="flex justify-end">
             <view class="max-w-[80%] bg-user-bubble rounded-2xl rounded-tr-sm px-4 py-3">
-              <text class="text-gray-800 text-sm leading-relaxed">{{ msg.content }}</text>
+              <text user-select class="text-gray-800 text-sm leading-relaxed">{{ msg.content }}</text>
               <image
                 v-if="msg.imageUrl"
                 :src="msg.imageUrl"
@@ -374,7 +425,7 @@ function parsePlainText(content: string): string {
                   <text class="text-orange-500 font-medium text-sm shrink-0">
                     {{ idx + 1 }}.
                   </text>
-                  <text class="text-gray-700 text-sm leading-relaxed">
+                  <text user-select class="text-gray-700 text-sm leading-relaxed">
                     {{ item.replace(/^\d+[.、]\s*/, '') }}
                   </text>
                 </view>
@@ -383,6 +434,7 @@ function parsePlainText(content: string): string {
               <!-- 普通文本 -->
               <text
                 v-if="parsePlainText(msg.content)"
+                user-select
                 class="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap"
               >
                 {{ parsePlainText(msg.content) }}
@@ -397,7 +449,7 @@ function parsePlainText(content: string): string {
               <!-- 免责声明 -->
               <view v-if="!msg.isStreaming && msg.content" class="flex items-start gap-1 mt-4">
                 <text class="text-gray-400 text-xs">ⓘ</text>
-                <text class="text-gray-400 text-xs leading-relaxed">
+                <text user-select class="text-gray-400 text-xs leading-relaxed">
                   以上建议仅供参考，不能替代专业兽医诊断，如有紧急情况请立即就医。
                 </text>
               </view>
@@ -445,7 +497,47 @@ function parsePlainText(content: string): string {
         <text class="text-orange-600 text-sm">正在聆听，松开结束...</text>
       </view>
 
+      <!-- 待发送图片预览 -->
+      <view
+        v-if="pendingImagePreview"
+        class="mb-2 px-1 flex items-center gap-3"
+      >
+        <view class="relative">
+          <image
+            :src="pendingImagePreview"
+            class="w-16 h-16 rounded-xl border border-gray-200"
+            mode="aspectFill"
+          />
+          <view
+            v-if="isUploading"
+            class="absolute inset-0 bg-black/30 rounded-xl flex items-center justify-center"
+          >
+            <text class="text-white text-xs">上传中</text>
+          </view>
+        </view>
+        <view class="flex-1 min-w-0">
+          <text class="text-gray-600 text-xs block">
+            {{ isUploading ? '正在上传图片...' : '图片已就绪，可输入描述后发送' }}
+          </text>
+        </view>
+        <view
+          class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center shrink-0"
+          @tap="clearPendingImage"
+        >
+          <text class="text-gray-500 text-sm">×</text>
+        </view>
+      </view>
+
       <view class="flex items-center gap-2 bg-white rounded-full px-3 py-2 shadow-sm">
+        <!-- 图片上传 -->
+        <view
+          class="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+          :class="isLoading || isUploading || isRecording ? 'bg-gray-200' : 'bg-gray-100'"
+          @tap="handleChooseImage"
+        >
+          <text class="text-base">📎</text>
+        </view>
+
         <!-- 语音按钮：按住说话（勿对 touchcancel 使用 .prevent） -->
         <view
           v-if="voiceSupported"
@@ -465,7 +557,7 @@ function parsePlainText(content: string): string {
           placeholder="描述症状，或按住麦克风..."
           placeholder-class="text-gray-400"
           confirm-type="send"
-          :disabled="isLoading || isRecording"
+          :disabled="isLoading || isRecording || isUploading"
           @confirm="handleSend()"
         />
 
@@ -481,7 +573,7 @@ function parsePlainText(content: string): string {
 
         <view
           class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-          :class="isLoading || isRecording ? 'bg-gray-200' : 'bg-orange-500'"
+          :class="isLoading || isRecording || isUploading ? 'bg-gray-200' : 'bg-orange-500'"
           @tap="handleSend()"
         >
           <text class="text-white text-sm">↑</text>

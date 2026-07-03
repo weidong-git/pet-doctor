@@ -1,4 +1,5 @@
 target/
+uploads/
 application-local.yml
 .env
 .env.local

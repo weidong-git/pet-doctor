@@ -5,6 +5,8 @@ pet-doctor-miniapp/unpackage/
 
 # 后端
 pet-doctor-backend/target/
+pet-doctor-backend/uploads/
+uploads/
 
 # 环境变量
 .env.local

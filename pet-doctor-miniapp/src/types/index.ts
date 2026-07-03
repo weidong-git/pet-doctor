@@ -32,3 +32,10 @@ export interface StreamCallbacks {
   onDone: () => void
   onError: (message: string) => void
 }
+
+/** 文件上传响应 */
+export interface FileUploadResult {
+  fileId: string
+  url: string
+  contentType: string
+}

@@ -36,3 +36,9 @@ speech:
   tts-model: tts-1
   tts-voice: nova
   audio-cache-ttl-seconds: 300
+
+# 文件上传（小程序图片问诊）
+file:
+  upload-dir: ${FILE_UPLOAD_DIR:./uploads}
+  public-base-url: ${FILE_PUBLIC_BASE_URL:http://127.0.0.1:8080}
+  max-size-mb: 10
