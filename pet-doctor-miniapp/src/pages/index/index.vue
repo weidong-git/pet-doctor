@@ -3,6 +3,8 @@ import { ref, computed, nextTick, watch, onMounted, onUnmounted } from 'vue'
 import { sendMessage, cancelActiveChat } from '@/api/chat'
 import { uploadImage } from '@/api/upload'
 import { WechatVoiceService, isVoiceSupported, checkSpeechAvailable, showSpeechConfigHint } from '@/utils/voice'
+import { useAppTabBar } from '@/utils/tabBar'
+import AppTabBar from '@/components/AppTabBar.vue'
 import type { Pet, ChatMessage } from '@/types'
 
 /** 宠物列表 */
@@ -42,6 +44,8 @@ const messages = ref<ChatMessage[]>([
 ])
 
 const currentPet = computed(() => pets.value.find((p) => p.id === currentPetId.value))
+
+useAppTabBar()
 
 onMounted(() => {
   initLayout()
@@ -151,8 +155,10 @@ async function speakMessage(msg: ChatMessage) {
 /** 初始化页面布局高度（小程序 tabBar 页 height:100% 常为 0，需用 windowHeight） */
 function initLayout() {
   const sys = uni.getSystemInfoSync()
-  const usableHeight = sys.windowHeight || 667
-  pageHeight.value = `${usableHeight}px`
+  const safeBottom = sys.safeAreaInsets?.bottom ?? 0
+  const tabBarHeight = 48 + safeBottom
+  const usableHeight = Math.max(400, (sys.windowHeight || 667) - tabBarHeight)
+  pageHeight.value = `${usableHeight + tabBarHeight}px`
 
   const headerPx = uni.upx2px(180)
   const quickPx = uni.upx2px(88)
@@ -580,6 +586,7 @@ function parsePlainText(content: string): string {
         </view>
       </view>
     </view>
+    <AppTabBar :selected="0" />
   </view>
 </template>
 

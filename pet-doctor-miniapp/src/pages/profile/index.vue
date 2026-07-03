@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { useAppTabBar } from '@/utils/tabBar'
+import AppTabBar from '@/components/AppTabBar.vue'
+
+useAppTabBar()
+
 const pets = [
   { id: 1, name: '小贝', breed: '金毛', age: '3岁' },
   { id: 2, name: '富贵', breed: '布偶猫', age: '2岁' },
@@ -6,7 +11,7 @@ const pets = [
 </script>
 
 <template>
-  <view class="min-h-screen bg-cream px-5 py-6">
+  <view class="min-h-screen bg-cream px-5 py-6 pb-tab-safe">
     <text class="text-lg font-medium text-gray-800 mb-6 block">我的档案</text>
 
     <view
@@ -22,5 +27,7 @@ const pets = [
         <text class="text-gray-400 text-sm">{{ pet.breed }} · {{ pet.age }}</text>
       </view>
     </view>
+
+    <AppTabBar :selected="2" />
   </view>
 </template>

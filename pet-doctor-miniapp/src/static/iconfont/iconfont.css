@@ -1,0 +1,15 @@
+@font-face {
+  font-family: 'iconfont';
+  src:
+    url('https://at.alicdn.com/t/c/font_5204310_xddrpnya1pe.woff2?t=1783062521416') format('woff2'),
+    url('https://at.alicdn.com/t/c/font_5204310_xddrpnya1pe.woff?t=1783062521416') format('woff'),
+    url('https://at.alicdn.com/t/c/font_5204310_xddrpnya1pe.ttf?t=1783062521416') format('truetype');
+}
+
+.iconfont {
+  font-family: 'iconfont' !important;
+  font-size: 44rpx;
+  font-style: normal;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
